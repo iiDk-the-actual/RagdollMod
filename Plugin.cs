@@ -257,8 +257,11 @@ namespace RagdollMod
 
             if (Time.time > endDeathSoundTime && endDeathSoundTime > 0)
             {
-                GorillaTagger.Instance.myRecorder.AudioClip = LoadSoundFromResource("Silence");
-                GorillaTagger.Instance.myRecorder.RestartRecording(true);
+                if (GorillaTagger.Instance.myRecorder != null)
+                {
+                    GorillaTagger.Instance.myRecorder.AudioClip = LoadSoundFromResource("Silence");
+                    GorillaTagger.Instance.myRecorder.RestartRecording(true);
+                }
                 endDeathSoundTime = -1;
             }
 
