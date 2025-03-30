@@ -6,7 +6,7 @@ A mod for Gorilla Tag that lets you ragdoll like Garry's Mod.
 ---
 
 # Controls
-- Toggle Death: Right Joystick Click
+- Toggle Death: Right Joystick Click / B
 
 ---
 
