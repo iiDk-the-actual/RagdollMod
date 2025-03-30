@@ -178,7 +178,7 @@ namespace RagdollMod
                 uiCoroutine = StartCoroutine(ShowGModUI());
             }
 
-            AudioClip Sound = LoadSoundFromResource("GMOD");
+            AudioClip Sound = LoadSoundFromResource("GMOD-Net");
             if (GorillaTagger.Instance.myRecorder != null)
             {
                 GorillaTagger.Instance.myRecorder.SourceType = Recorder.InputSourceType.AudioClip;
@@ -257,7 +257,7 @@ namespace RagdollMod
 
             if (Time.time > endDeathSoundTime && endDeathSoundTime > 0)
             {
-                GorillaTagger.Instance.myRecorder.AudioClip = LoadSoundFromResource("Silence.wav");
+                GorillaTagger.Instance.myRecorder.AudioClip = LoadSoundFromResource("Silence");
                 GorillaTagger.Instance.myRecorder.RestartRecording(true);
                 endDeathSoundTime = -1;
             }
