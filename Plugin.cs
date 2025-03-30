@@ -245,7 +245,7 @@ namespace RagdollMod
                 IsSteam = Traverse.Create(PlayFabAuthenticator.instance).Field("platform").GetValue().ToString().ToLower() == "steam";
             }
 
-            if (GetRightJoystickDown() && !lastLeftHeld)
+            if ((GetRightJoystickDown() || UnityInput.Current.GetKey(KeyCode.B)) && !lastLeftHeld)
             {
                 isDead = !isDead;
 
@@ -253,7 +253,7 @@ namespace RagdollMod
                     Die();
             }
 
-            lastLeftHeld = GetRightJoystickDown();
+            lastLeftHeld = GetRightJoystickDown() || UnityInput.Current.GetKey(KeyCode.B);
 
             if (Time.time > endDeathSoundTime && endDeathSoundTime > 0)
             {
