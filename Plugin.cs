@@ -82,9 +82,9 @@ namespace RagdollMod
         {
             try
             {
-                GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(false);
-                GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(false);
-                GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("Default");
+                GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(false);
+                GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(false);
+                GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("Default");
 
                 foreach (GameObject Cosmetic in GorillaTagger.Instance.offlineVRRig.cosmetics)
                 {
@@ -101,10 +101,10 @@ namespace RagdollMod
 
         public static void EnableCosmetics()
         {
-            GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(true);
-            GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(true);
+            GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(true);
+            GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(true);
 
-            GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("MirrorOnly");
+            GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("MirrorOnly");
             foreach (GameObject Cosmetic in portedCosmetics)
             {
                 Cosmetic.transform.SetParent(GorillaTagger.Instance.offlineVRRig.mainCamera.transform.Find("HeadCosmetics"), false);
@@ -130,8 +130,8 @@ namespace RagdollMod
             endDeathSoundTime = Time.time + 5.265f;
 
             Ragdoll = LoadAsset("ragdoll");
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.position = GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body").position;
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.rotation = GorillaTagger.Instance.offlineVRRig.transform.Find("RigAnchor/rig/body").rotation;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.position = GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body").position;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.rotation = GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body").rotation;
 
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.position = GorillaTagger.Instance.offlineVRRig.leftHand.rigTarget.transform.position;
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.rotation = GorillaTagger.Instance.offlineVRRig.leftHand.rigTarget.transform.rotation;
@@ -152,13 +152,13 @@ namespace RagdollMod
             };
             foreach (string velocity in velocitySets)
             {
-                Ragdoll.transform.Find(velocity).GetComponent<Rigidbody>().velocity = GorillaTagger.Instance.rigidbody.velocity; ;
+                Ragdoll.transform.Find(velocity).GetComponent<Rigidbody>().linearVelocity = GorillaTagger.Instance.rigidbody.linearVelocity;
             }
 
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").GetComponent<Rigidbody>().velocity = GorillaLocomotion.GTPlayer.Instance.leftHandCenterVelocityTracker.GetAverageVelocity(true, 0);
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").GetComponent<Rigidbody>().linearVelocity = GorillaLocomotion.GTPlayer.Instance.leftHandCenterVelocityTracker.GetAverageVelocity(true, 0);
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").GetComponent<Rigidbody>().angularVelocity = GameObject.Find("Player Objects/Player VR Controller/GorillaPlayer/TurnParent/LeftHand Controller").GetOrAddComponent<GorillaVelocityEstimator>().angularVelocity;
 
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").GetComponent<Rigidbody>().velocity = GorillaLocomotion.GTPlayer.Instance.rightHandCenterVelocityTracker.GetAverageVelocity(true, 0);
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").GetComponent<Rigidbody>().linearVelocity = GorillaLocomotion.GTPlayer.Instance.rightHandCenterVelocityTracker.GetAverageVelocity(true, 0);
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").GetComponent<Rigidbody>().angularVelocity = GameObject.Find("Player Objects/Player VR Controller/GorillaPlayer/TurnParent/RightHand Controller").GetOrAddComponent<GorillaVelocityEstimator>().angularVelocity;
 
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/head").transform.rotation = GorillaTagger.Instance.headCollider.transform.rotation;
@@ -270,7 +270,7 @@ namespace RagdollMod
                 if (Ragdoll != null)
                 {
                     GorillaTagger.Instance.offlineVRRig.enabled = false;
-                    GorillaTagger.Instance.rigidbody.velocity = Vector3.zero;
+                    GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
 
                     UpdateRigPos();
                 }
