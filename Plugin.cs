@@ -82,16 +82,16 @@ namespace RagdollMod
         {
             try
             {
-                GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(false);
-                GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(false);
-                GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("Default");
+                VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(false);
+                VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(false);
+                VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("Default");
 
-                foreach (GameObject Cosmetic in GorillaTagger.Instance.offlineVRRig.cosmetics)
+                foreach (GameObject Cosmetic in VRRig.LocalRig.cosmetics)
                 {
-                    if (Cosmetic.activeSelf && Cosmetic.transform.parent == GorillaTagger.Instance.offlineVRRig.mainCamera.transform.Find("HeadCosmetics"))
+                    if (Cosmetic.activeSelf && Cosmetic.transform.parent == VRRig.LocalRig.mainCamera.transform.Find("HeadCosmetics"))
                     {
                         portedCosmetics.Add(Cosmetic);
-                        Cosmetic.transform.SetParent(GorillaTagger.Instance.offlineVRRig.headMesh.transform, false);
+                        Cosmetic.transform.SetParent(VRRig.LocalRig.headMesh.transform, false);
                         Cosmetic.transform.localPosition += new Vector3(0f, 0.1333f, 0.1f);
                     }
                 }
@@ -101,13 +101,13 @@ namespace RagdollMod
 
         public static void EnableCosmetics()
         {
-            GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(true);
-            GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(true);
+            VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemLeftShoulder").gameObject.SetActive(true);
+            VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/TransferrableItemRightShoulder").gameObject.SetActive(true);
 
-            GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("MirrorOnly");
+            VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body/head/gorillaface").gameObject.layer = LayerMask.NameToLayer("MirrorOnly");
             foreach (GameObject Cosmetic in portedCosmetics)
             {
-                Cosmetic.transform.SetParent(GorillaTagger.Instance.offlineVRRig.mainCamera.transform.Find("HeadCosmetics"), false);
+                Cosmetic.transform.SetParent(VRRig.LocalRig.mainCamera.transform.Find("HeadCosmetics"), false);
                 Cosmetic.transform.localPosition -= new Vector3(0f, 0.1333f, 0.1f);
             }
 
@@ -119,7 +119,7 @@ namespace RagdollMod
             if (Ragdoll != null)
                 UnityEngine.Object.Destroy(Ragdoll);
 
-            GorillaTagger.Instance.offlineVRRig.enabled = false;
+            VRRig.LocalRig.enabled = false;
             DisableCosmetics();
 
             PreviousSerializationRate = PhotonNetwork.SerializationRate;
@@ -130,14 +130,14 @@ namespace RagdollMod
             endDeathSoundTime = Time.time + 5.265f;
 
             Ragdoll = LoadAsset("ragdoll");
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.position = GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body").position;
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.rotation = GorillaTagger.Instance.offlineVRRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body").rotation;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.position = VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body").position;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.rotation = VRRig.LocalRig.transform.Find("GorillaPlayerNetworkedRigAnchor/rig/body").rotation;
 
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.position = GorillaTagger.Instance.offlineVRRig.leftHand.rigTarget.transform.position;
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.rotation = GorillaTagger.Instance.offlineVRRig.leftHand.rigTarget.transform.rotation;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.position = VRRig.LocalRig.leftHand.rigTarget.transform.position;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.rotation = VRRig.LocalRig.leftHand.rigTarget.transform.rotation;
 
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.position = GorillaTagger.Instance.offlineVRRig.rightHand.rigTarget.transform.position;
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.rotation = GorillaTagger.Instance.offlineVRRig.rightHand.rigTarget.transform.rotation;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.position = VRRig.LocalRig.rightHand.rigTarget.transform.position;
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.rotation = VRRig.LocalRig.rightHand.rigTarget.transform.rotation;
 
             string[] velocitySets = new string[]
             {
@@ -163,7 +163,7 @@ namespace RagdollMod
 
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/head").transform.rotation = GorillaTagger.Instance.headCollider.transform.rotation;
 
-            GorillaTagger.Instance.offlineVRRig.head.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/head").transform.rotation;
+            VRRig.LocalRig.head.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/head").transform.rotation;
 
             Ragdoll.transform.Find("Stand/Mesh").gameObject.GetComponent<Renderer>().renderingLayerMask = 0;
 
@@ -269,7 +269,7 @@ namespace RagdollMod
             {
                 if (Ragdoll != null)
                 {
-                    GorillaTagger.Instance.offlineVRRig.enabled = false;
+                    VRRig.LocalRig.enabled = false;
                     GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
 
                     UpdateRigPos();
@@ -279,7 +279,7 @@ namespace RagdollMod
             {
                 if (Ragdoll != null)
                 {
-                    GorillaTagger.Instance.offlineVRRig.enabled = true;
+                    VRRig.LocalRig.enabled = true;
                     EnableCosmetics();
 
                     if (PreviousSerializationRate > 0)
@@ -315,16 +315,16 @@ namespace RagdollMod
             GorillaTagger.Instance.leftHandTransform.position = GorillaTagger.Instance.bodyCollider.transform.position;
             GorillaTagger.Instance.rightHandTransform.position = GorillaTagger.Instance.bodyCollider.transform.position;
 
-            GorillaTagger.Instance.offlineVRRig.transform.position = Ragdoll.transform.Find("Stand/Gorilla Rig/body").gameObject.transform.position;
-            GorillaTagger.Instance.offlineVRRig.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.rotation;
+            VRRig.LocalRig.transform.position = Ragdoll.transform.Find("Stand/Gorilla Rig/body").gameObject.transform.position;
+            VRRig.LocalRig.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.rotation;
 
-            GorillaTagger.Instance.offlineVRRig.leftHand.rigTarget.transform.position = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.position;
-            GorillaTagger.Instance.offlineVRRig.rightHand.rigTarget.transform.position = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.position;
+            VRRig.LocalRig.leftHand.rigTarget.transform.position = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.position;
+            VRRig.LocalRig.rightHand.rigTarget.transform.position = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.position;
 
-            GorillaTagger.Instance.offlineVRRig.leftHand.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.rotation;
-            GorillaTagger.Instance.offlineVRRig.rightHand.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.rotation;
+            VRRig.LocalRig.leftHand.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").transform.rotation;
+            VRRig.LocalRig.rightHand.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").transform.rotation;
 
-            GorillaTagger.Instance.offlineVRRig.head.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/head").transform.rotation;
+            VRRig.LocalRig.head.rigTarget.transform.rotation = Ragdoll.transform.Find("Stand/Gorilla Rig/body/head").transform.rotation;
         }
 
         public static Vector3 startForward;
