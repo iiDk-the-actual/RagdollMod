@@ -7,6 +7,6 @@
     {
         public const string GUID = "com.goldentrophy.gorillatag.ragdollmod";
         public const string Name = "RagdollMod";
-        public const string Version = "1.0.5";
+        public const string Version = "1.0.6";
     }
 }
