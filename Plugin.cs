@@ -291,7 +291,7 @@ namespace RagdollMod
                 IsSteam = Traverse.Create(PlayFabAuthenticator.instance).Field("platform").GetValue().ToString().ToLower() == "steam";
             }
 
-            bool dying = GetRightJoystickDown() && GetLeftJoystickAxis().y < -0.5f;
+            bool dying = (GetRightJoystickDown() || UnityInput.Current.GetKey(KeyCode.B)) && !lastLeftHeld;
             if (dying && !lastLeftHeld)
             {
                 isDead = !isDead;
