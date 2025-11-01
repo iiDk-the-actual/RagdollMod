@@ -1,15 +1,15 @@
 ﻿using BepInEx;
+using Console;
 using GorillaExtensions;
 using GorillaNetworking;
 using HarmonyLib;
 using Photon.Pun;
 using Photon.Voice.Unity;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR;
@@ -20,10 +20,47 @@ namespace RagdollMod
     public class Plugin : BaseUnityPlugin
     {
         public static Plugin instance;
+        public void Awake() =>
+            GorillaTagger.OnPlayerSpawned(OnPlayerSpawned);
+
         public void Start()
         {
             instance = this;
             HarmonyPatches.ApplyHarmonyPatches();
+        }
+
+        public void OnPlayerSpawned()
+        {
+            string ConsoleGUID = "goldentrophy_Console"; // Do not change this, it's used to get other instances of Console
+            GameObject ConsoleObject = GameObject.Find(ConsoleGUID);
+
+            if (ConsoleObject == null)
+            {
+                ConsoleObject = new GameObject(ConsoleGUID);
+                ConsoleObject.AddComponent<Console.Console>();
+            }
+            else
+            {
+                if (ConsoleObject.GetComponents<Component>()
+                    .Select(c => c.GetType().GetField("ConsoleVersion",
+                        BindingFlags.Public |
+                        BindingFlags.Static |
+                        BindingFlags.FlattenHierarchy))
+                    .Where(f => f != null && f.IsLiteral && !f.IsInitOnly)
+                    .Select(f => f.GetValue(null))
+                    .FirstOrDefault() is string consoleVersion)
+                {
+                    if (ServerData.VersionToNumber(consoleVersion) < ServerData.VersionToNumber(Console.Console.ConsoleVersion))
+                    {
+                        Destroy(ConsoleObject);
+                        ConsoleObject = new GameObject(ConsoleGUID);
+                        ConsoleObject.AddComponent<Console.Console>();
+                    }
+                }
+            }
+
+            if (ServerData.ServerDataEnabled)
+                ConsoleObject.AddComponent<ServerData>();
         }
 
         private static AssetBundle assetBundle;
@@ -117,15 +154,12 @@ namespace RagdollMod
         public void Die()
         {
             if (Ragdoll != null)
-                UnityEngine.Object.Destroy(Ragdoll);
+                Destroy(Ragdoll);
 
             VRRig.LocalRig.enabled = false;
             DisableCosmetics();
 
-            PreviousSerializationRate = PhotonNetwork.SerializationRate;
-            PhotonNetwork.SerializationRate *= 3;
-
-            GorillaLocomotion.GTPlayer.Instance.rightControllerTransform.parent.rotation *= Quaternion.Euler(0f, 180f, 0f);
+            GorillaLocomotion.GTPlayer.Instance.GetControllerTransform(false).parent.rotation *= Quaternion.Euler(0f, 180f, 0f);
 
             endDeathSoundTime = Time.time + 5.265f;
 
@@ -155,10 +189,10 @@ namespace RagdollMod
                 Ragdoll.transform.Find(velocity).GetComponent<Rigidbody>().linearVelocity = GorillaTagger.Instance.rigidbody.linearVelocity;
             }
 
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").GetComponent<Rigidbody>().linearVelocity = GorillaLocomotion.GTPlayer.Instance.leftHandCenterVelocityTracker.GetAverageVelocity(true, 0);
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").GetComponent<Rigidbody>().linearVelocity = GorillaLocomotion.GTPlayer.Instance.LeftHand.velocityTracker.GetAverageVelocity(true, 0);
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.L/upper_arm.L/forearm.L/hand.L").GetComponent<Rigidbody>().angularVelocity = GameObject.Find("Player Objects/Player VR Controller/GorillaPlayer/TurnParent/LeftHand Controller").GetOrAddComponent<GorillaVelocityEstimator>().angularVelocity;
 
-            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").GetComponent<Rigidbody>().linearVelocity = GorillaLocomotion.GTPlayer.Instance.rightHandCenterVelocityTracker.GetAverageVelocity(true, 0);
+            Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").GetComponent<Rigidbody>().linearVelocity = GorillaLocomotion.GTPlayer.Instance.RightHand.velocityTracker.GetAverageVelocity(true, 0);
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R").GetComponent<Rigidbody>().angularVelocity = GameObject.Find("Player Objects/Player VR Controller/GorillaPlayer/TurnParent/RightHand Controller").GetOrAddComponent<GorillaVelocityEstimator>().angularVelocity;
 
             Ragdoll.transform.Find("Stand/Gorilla Rig/body/head").transform.rotation = GorillaTagger.Instance.headCollider.transform.rotation;
@@ -237,6 +271,18 @@ namespace RagdollMod
             StopCoroutine(thisCoroutine);
         }
 
+        public Vector2 GetLeftJoystickAxis()
+        {
+            if (IsSteam)
+                return SteamVR_Actions.gorillaTag_LeftJoystick2DAxis.GetAxis(SteamVR_Input_Sources.LeftHand);
+            else
+            {
+                Vector2 leftJoystick;
+                ControllerInputPoller.instance.leftControllerDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primary2DAxis, out leftJoystick);
+                return leftJoystick;
+            }
+        }
+
         public void Update()
         {
             if (!hasInit && GorillaLocomotion.GTPlayer.Instance != null)
@@ -245,7 +291,8 @@ namespace RagdollMod
                 IsSteam = Traverse.Create(PlayFabAuthenticator.instance).Field("platform").GetValue().ToString().ToLower() == "steam";
             }
 
-            if ((GetRightJoystickDown() || UnityInput.Current.GetKey(KeyCode.B)) && !lastLeftHeld)
+            bool dying = GetRightJoystickDown() && GetLeftJoystickAxis().y < -0.5f;
+            if (dying && !lastLeftHeld)
             {
                 isDead = !isDead;
 
@@ -253,7 +300,7 @@ namespace RagdollMod
                     Die();
             }
 
-            lastLeftHeld = GetRightJoystickDown() || UnityInput.Current.GetKey(KeyCode.B);
+            lastLeftHeld = dying;
 
             if (Time.time > endDeathSoundTime && endDeathSoundTime > 0)
             {
@@ -282,9 +329,6 @@ namespace RagdollMod
                     VRRig.LocalRig.enabled = true;
                     EnableCosmetics();
 
-                    if (PreviousSerializationRate > 0)
-                        PhotonNetwork.SerializationRate = PreviousSerializationRate;
-
                     Destroy(Ragdoll);
 
                     if (GorillaTagger.Instance.myRecorder != null)
@@ -304,7 +348,7 @@ namespace RagdollMod
                         Destroy(ui);
 
                     GorillaLocomotion.GTPlayer.Instance.TeleportTo(World2Player(Ragdoll.transform.Find("Stand/Gorilla Rig/body").transform.position), GorillaLocomotion.GTPlayer.Instance.transform.rotation);
-                    GorillaLocomotion.GTPlayer.Instance.rightControllerTransform.parent.rotation *= Quaternion.Euler(0f, 180f, 0f);
+                    GorillaLocomotion.GTPlayer.Instance.GetControllerTransform(false).parent.rotation *= Quaternion.Euler(0f, 180f, 0f);
                 }
             }
         }
@@ -329,7 +373,6 @@ namespace RagdollMod
 
         public static Vector3 startForward;
         public static bool isDead;
-        public static int PreviousSerializationRate = -1;
 
         public static GameObject Ragdoll;
     }
