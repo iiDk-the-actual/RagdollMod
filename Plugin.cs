@@ -285,13 +285,16 @@ namespace RagdollMod
 
         public void Update()
         {
-            if (!hasInit && GorillaLocomotion.GTPlayer.Instance != null)
+            if (GorillaLocomotion.GTPlayer.Instance != null)
+                return;
+
+            if (!hasInit)
             {
                 hasInit = true;
                 IsSteam = Traverse.Create(PlayFabAuthenticator.instance).Field("platform").GetValue().ToString().ToLower() == "steam";
             }
 
-            bool dying = (GetRightJoystickDown() || UnityInput.Current.GetKey(KeyCode.B)) && !lastLeftHeld;
+            bool dying = GetRightJoystickDown() || UnityInput.Current.GetKey(KeyCode.B);
             if (dying && !lastLeftHeld)
             {
                 isDead = !isDead;
